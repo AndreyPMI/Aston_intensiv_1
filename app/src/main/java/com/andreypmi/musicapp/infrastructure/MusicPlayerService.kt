@@ -154,7 +154,7 @@ class MusicPlayerService : LifecycleService() {
         val dismissPendingIntent  =
             PendingIntent.getBroadcast(
                 context,
-                3,
+                4,
                 dismissIntent,
                 PendingIntent.FLAG_IMMUTABLE
             )
