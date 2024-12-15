@@ -1,28 +1,22 @@
 package com.andreypmi.musicapp.app
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.andreypmi.musicapp.data.repositoryImpl.MusicRepositoryImpl
+import androidx.lifecycle.lifecycleScope
+import com.andreypmi.musicapp.R
 import com.andreypmi.musicapp.databinding.ActivityMainBinding
-import com.andreypmi.musicapp.domain.repository.MusicRepository
-import com.andreypmi.musicapp.presentation.MainViewModel
+import com.andreypmi.musicapp.presentation.MusicViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val notificationPermissionRequestCode = 123
-    private val musicViewModel: MainViewModel by viewModels {
-        MusicViewModelFactory(this)
-    }
+    private lateinit var musicViewModel: MusicViewModel
 
     private fun areNotificationsEnabled(): Boolean =
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).areNotificationsEnabled()
@@ -36,29 +30,34 @@ class MainActivity : AppCompatActivity() {
             )
         }
         super.onCreate(savedInstanceState)
+        val app = application as MusicApplication
+        musicViewModel = app.musicViewModel
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         binding.btnPlayPause.setOnClickListener {
-            musicViewModel.play(1)
+            musicViewModel.togglePlay()
+        }
+        musicViewModel.isPlaying.observe(this){
+            if (it){
+                binding.btnPlayPause.setImageResource(R.drawable.ic_pause)
+            } else{
+                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
+            }
+        }
+        lifecycleScope.launch {
+            musicViewModel.currentTrackPosition.collectLatest{ track ->
+                track?.let{
+                    binding.textTrackTitle.text = it.title
+                }
+            }
         }
         binding.btnNext.setOnClickListener {
-            musicViewModel.nextTrack()
+            musicViewModel.next()
         }
 
         binding.btnPrevious.setOnClickListener {
-            musicViewModel.previousTrack()
+            musicViewModel.previous()
         }
     }
 
-}
-
-class MusicViewModelFactory(private val activity: Activity) :
-    ViewModelProvider.Factory { // Передаем Activity
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(MusicRepositoryImpl(activity)) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

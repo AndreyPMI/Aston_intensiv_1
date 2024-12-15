@@ -4,4 +4,5 @@
     <string name="empty_line">" "</string>
     <string name="play_pause">play pause</string>
     <string name="next">next</string>
+    <string name="track0">Track 0</string>
 </resources>

@@ -1,11 +1,16 @@
 package com.andreypmi.musicapp.domain.repository
 
 import com.andreypmi.musicapp.domain.model.TrackModel
+import kotlinx.coroutines.flow.StateFlow
 
 interface MusicRepository {
-    suspend fun getTrack(): List<TrackModel>
-    suspend fun play(track: TrackModel): Unit
-    suspend fun pause(): Unit
-    suspend fun nextTrack(): Unit
-    suspend fun previousTrack(): Unit
+    val currentTrack: StateFlow<TrackModel?>
+    val isPlaying: StateFlow<Boolean>
+    fun play(track: TrackModel)
+    fun pause(track: TrackModel)
+    fun playNext(): TrackModel?
+    fun playPrevious(): TrackModel?
+    fun getTrack(): List<TrackModel>
+    fun isPlaying(): Boolean
+    fun stop()
 }
