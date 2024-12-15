@@ -1,14 +1,12 @@
 package com.andreypmi.musicapp.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.andreypmi.musicapp.domain.model.TrackModel
 import com.andreypmi.musicapp.domain.repository.MusicRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MusicViewModel(application: Application, private val musicRepository: MusicRepository) : AndroidViewModel(application) {
@@ -51,6 +49,7 @@ class MusicViewModel(application: Application, private val musicRepository: Musi
         }
     }
     fun stop(){
-        musicRepository
+        musicRepository.stop()
+        _isPlaying.value = false
     }
 }

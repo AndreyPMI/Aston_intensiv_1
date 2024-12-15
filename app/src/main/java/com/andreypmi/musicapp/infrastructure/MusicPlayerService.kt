@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
@@ -42,9 +41,7 @@ class MusicPlayerService : LifecycleService() {
         notificationManager = NotificationManagerCompat.from(this)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
                 CHANNEL_ID,
                 "Music Player Service Channel",
@@ -56,7 +53,6 @@ class MusicPlayerService : LifecycleService() {
             }
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(serviceChannel)
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -64,7 +60,7 @@ class MusicPlayerService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 "PLAY" -> {
-                    var track: TrackModel? = null
+                    val track: TrackModel?
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
                         track = it.getParcelableExtra<TrackModel>("track", TrackModel::class.java)
                     } else @Suppress("DEPRECATION") {
@@ -82,7 +78,7 @@ class MusicPlayerService : LifecycleService() {
 
                 "PAUSE" -> {
                     mediaPlayer.pause()
-                    var track: TrackModel? = null
+                    val track: TrackModel?
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
                         track = it.getParcelableExtra<TrackModel>("track", TrackModel::class.java)
                     } else @Suppress("DEPRECATION") {
@@ -93,7 +89,7 @@ class MusicPlayerService : LifecycleService() {
 
                 }
                 "STOP" ->{
-                    //this.st
+                    this.stopService(intent)
                 }
                 else -> null
             }
